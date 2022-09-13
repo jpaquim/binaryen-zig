@@ -16,6 +16,11 @@ pub fn build(b: *std.build.Builder) void {
     exe.setBuildMode(mode);
     exe.install();
 
+    // link binaryen static library
+    exe.addIncludePath("binaryen/src");
+    exe.addObjectFile("binaryen/lib/libbinaryen.a");
+    exe.linkLibCpp();
+
     const run_cmd = exe.run();
     run_cmd.step.dependOn(b.getInstallStep());
     if (b.args) |args| {
