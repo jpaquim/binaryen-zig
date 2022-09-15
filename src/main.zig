@@ -1,25 +1,22 @@
 const std = @import("std");
 
-const binaryen = @cImport({
-    @cInclude("binaryen-c.h");
-});
+const binaryen = @import("./binaryen.zig");
 
 pub fn main() anyerror!void {
-    const module = binaryen.BinaryenModuleCreate();
+    const module = binaryen.Module.init();
+    defer module.deinit();
 
-    defer binaryen.BinaryenModuleDispose(module);
+    var ii = [_]binaryen.Type{ binaryen.typeInt32(), binaryen.typeInt32() };
+    const params = binaryen.typeCreate(ii[0..]);
+    const results = binaryen.typeInt32();
 
-    var ii = [_]binaryen.BinaryenType{binaryen.BinaryenTypeInt32(), binaryen.BinaryenTypeInt32()};
-    const params = binaryen.BinaryenTypeCreate(@ptrCast([*c]usize, &ii), 2);
-    const results = binaryen.BinaryenTypeInt32();
+    const x = module.makeLocalGet(0, binaryen.typeInt32());
+    const y = module.makeLocalGet(1, binaryen.typeInt32());
 
-    const x = binaryen.BinaryenLocalGet(module, 0, binaryen.BinaryenTypeInt32());
-    const y = binaryen.BinaryenLocalGet(module, 1, binaryen.BinaryenTypeInt32());
+    const add = module.makeBinary(binaryen.addInt32(), x, y);
 
-    const add = binaryen.BinaryenBinary(module, binaryen.BinaryenAddInt32(), x, y);
-
-    const adder = binaryen.BinaryenAddFunction(module, "adder", params, results, null, 0, add);
+    const adder = module.addFunction("adder", params, results, null, add);
     _ = adder;
 
-    binaryen.BinaryenModulePrint(module);
+    module.print();
 }
