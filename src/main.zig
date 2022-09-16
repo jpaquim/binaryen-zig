@@ -1,17 +1,18 @@
 const std = @import("std");
 
 const binaryen = @import("./binaryen.zig");
+const Type = binaryen.Type;
 
 pub fn main() anyerror!void {
     const module = binaryen.Module.init();
     defer module.deinit();
 
-    var ii = [_]binaryen.Type{ binaryen.typeInt32(), binaryen.typeInt32() };
-    const params = binaryen.typeCreate(ii[0..]);
-    const results = binaryen.typeInt32();
+    var ii = [_]Type{ Type.int32(), Type.int32() };
+    const params = Type.create(ii[0..]);
+    const results = Type.int32();
 
-    const x = module.makeLocalGet(0, binaryen.typeInt32());
-    const y = module.makeLocalGet(1, binaryen.typeInt32());
+    const x = module.makeLocalGet(0, Type.int32());
+    const y = module.makeLocalGet(1, Type.int32());
 
     const add = module.makeBinary(binaryen.addInt32(), x, y);
 
