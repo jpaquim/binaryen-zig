@@ -1,4 +1,5 @@
 const std = @import("std");
+const Allocator = std.mem.Allocator;
 
 pub const c = @cImport({
     @cInclude("binaryen-c.h");
@@ -188,6 +189,16 @@ pub const Module = opaque {
             if_true.toC(),
             if (if_false) |expr| expr.toC() else null,
         ));
+    }
+
+    pub fn write(self: *Module, buffer: []u8) usize {
+        return c.BinaryenModuleWrite(self.toC(), buffer.ptr, buffer.len);
+    }
+
+    pub fn writeAlloc(self: *Module, allocator: Allocator, max_size: ?usize) ![]u8 {
+        var buffer = try allocator.alloc(u8, max_size orelse 2 << 11); // 4Kib
+        const size = self.write(buffer);
+        return allocator.realloc(buffer, size);
     }
 };
 
