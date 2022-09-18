@@ -43,13 +43,65 @@ pub const Type = struct {
         return fromC(c.BinaryenTypeInt32());
     }
 
+    pub fn float32() Type {
+        return fromC(c.BinaryenTypeFloat32());
+    }
+
     pub fn create(value_types: []Type) Type {
         return fromC(c.BinaryenTypeCreate(sliceToC(value_types), @intCast(u32, value_types.len)));
     }
 };
 
+pub fn gtSInt32() Op {
+    return c.BinaryenGtSInt32();
+}
+
+pub fn ltSInt32() Op {
+    return c.BinaryenLtSInt32();
+}
+
+pub fn eqInt32() Op {
+    return c.BinaryenEqInt32();
+}
+
 pub fn addInt32() Op {
     return c.BinaryenAddInt32();
+}
+
+pub fn subInt32() Op {
+    return c.BinaryenSubInt32();
+}
+
+pub fn mulInt32() Op {
+    return c.BinaryenMulInt32();
+}
+
+pub fn gtFloat32() Op {
+    return c.BinaryenGtFloat32();
+}
+
+pub fn ltFloat32() Op {
+    return c.BinaryenLtFloat32();
+}
+
+pub fn eqFloat32() Op {
+    return c.BinaryenEqFloat32();
+}
+
+pub fn addFloat32() Op {
+    return c.BinaryenAddFloat32();
+}
+
+pub fn subFloat32() Op {
+    return c.BinaryenSubFloat32();
+}
+
+pub fn mulFloat32() Op {
+    return c.BinaryenMulFloat32();
+}
+
+pub fn divFloat32() Op {
+    return c.BinaryenDivFloat32();
 }
 
 pub const Module = opaque {
@@ -171,12 +223,13 @@ pub const Export = opaque {
 
 pub const Literal = struct {
     pub const TypeTag = enum(usize) {
+        none,
+        unreachable_,
         i32,
         i64,
         f32,
         f64,
         v128,
-        func,
     };
     tag: TypeTag,
     // data: extern union {
